@@ -1,0 +1,25 @@
+[package]
+name = "bypass_forbidden"
+version = "0.1.0"
+authors = ["Fredrik Grönqvist <fredrik.gronqvist@embark-studios.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = {version = "0.10.10"}
+http = "0.2.1"
+log = "0.4"
+env_logger = "0.8.2"
+clap = "2.33.3"
+tokio = { version = "0.2.22", features = ["macros", "fs"] }
+url = "2.2.0"
+cidr = "0.1.1"
+regex = "1"
+futures = "0.3.8"
+prettytable-rs = "0.8.0"
+
+
+[[bin]]
+name = "bypass_forbidden"
+path = "src/main.rs"
