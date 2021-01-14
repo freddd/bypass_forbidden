@@ -37,7 +37,7 @@ impl BruteForce {
                         .await,
                 )
             })
-            .buffer_unordered(4);
+            .buffer_unordered(10);
 
         result
             .for_each(|r| async {

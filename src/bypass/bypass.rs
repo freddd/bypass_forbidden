@@ -1,6 +1,7 @@
 use futures::{stream, StreamExt};
 use http::Method;
 use log::{error, info};
+
 use reqwest::{Client, RequestBuilder, Url};
 use std::collections::HashMap;
 
@@ -23,7 +24,7 @@ impl Bypass {
 
     fn paths(&self) -> Vec<&'static str> {
         return vec![
-            "%2e",
+            "%2e", // TODO: separate path from url flag
             "/.",
             "?",
             "??",
@@ -109,21 +110,18 @@ impl Bypass {
                 let resp = r.send().await;
                 (keep.unwrap(), resp)
             })
-            .buffer_unordered(4);
+            .buffer_unordered(10);
 
         resp.for_each(|r| async {
             match r.1 {
                 Ok(resp) => {
-                    if resp.status().is_success() {
-                        if self.content_length != 0 {
-                            match resp.content_length() {
-                                Some(cl) => {
-                                    if cl == self.content_length {
-                                        return;
-                                    }
-                                }
-                                None => {}
-                            }
+                    if resp.status().is_success() && self.content_length != 0 {
+                        if resp
+                            .content_length()
+                            .filter(|cl| cl == &self.content_length)
+                            .is_some()
+                        {
+                            return;
                         }
                         info!("Got past forbidden with req: {:#?}", r.0); // TODO:
                     }
