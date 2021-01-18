@@ -45,13 +45,10 @@ impl BruteForce {
                     Ok(resp) => {
                         if resp.status().is_success() {
                             if self.content_length != 0 {
-                                match resp.content_length() {
-                                    Some(cl) => {
-                                        if cl == self.content_length {
-                                            return;
-                                        }
+                                if let Some(cl) = resp.content_length() {
+                                    if cl == self.content_length {
+                                        return;
                                     }
-                                    None => {}
                                 }
                             }
                             info!(

@@ -113,12 +113,10 @@ fn validate_cidr(val: std::string::String) -> Result<(), String> {
 }
 
 fn validate_output(val: std::string::String) -> Result<(), String> {
-    if !val.is_empty() {
-        if val.ne("json") && val.ne("table") {
-            return Err(String::from(
-                "The only allowed formats are \"json\" and \"table\"",
-            ));
-        }
+    if !val.is_empty() && val.ne("json") && val.ne("table") {
+        return Err(String::from(
+            "The only allowed formats are \"json\" and \"table\"",
+        ));
     }
 
     Ok(())
