@@ -6,37 +6,39 @@ use reqwest::{Client, RequestBuilder, Url};
 use std::collections::HashMap;
 
 pub struct Bypass {
-    url: Url,
+    base: String,
+    path: String,
     client: reqwest::Client,
     content_length: u64,
     output: String,
 }
 
 impl Bypass {
-    pub fn new(url: Url, content_length: u64, output: String) -> Bypass {
+    pub fn new(base: String, path: String, content_length: u64, output: String) -> Bypass {
         Bypass {
-            url,
+            base,
+            path,
             client: Client::new(),
             content_length,
             output,
         }
     }
 
-    fn paths(&self) -> Vec<&'static str> {
+    fn paths(&self) -> Vec<String> {
         return vec![
-            "%2e", // TODO: separate path from url flag
-            "/.",
-            "?",
-            "??",
-            //"//",
-            "/./",
-            "/",
-            ".random-string",
-            "..;/",
-            "%09",
-            "%20",
-            ".html",
-            "#",
+            format!("%2e{}", &self.path),
+            format!("{}/.", &self.path),
+            format!("{}?", &self.path),
+            format!("{}??", &self.path),
+            format!("{}//", &self.path),
+            format!("{}/./", &self.path),
+            format!("{}/", &self.path),
+            format!("{}.random-string", &self.path),
+            format!("{}..;/", &self.path),
+            format!("{}%09", &self.path),
+            format!("{}%20", &self.path),
+            format!("{}.html", &self.path),
+            format!("{}#", &self.path),
         ];
     }
 
@@ -76,27 +78,34 @@ impl Bypass {
         return self
             .verbs()
             .iter()
-            .map(|p| self.client.request(p.clone(), self.url.clone()))
+            .map(|p| {
+                self.client
+                    .request(p.clone(), self.url().join(&self.path).unwrap())
+            })
             .collect();
     }
 
     fn using_different_headers(&self) -> Vec<RequestBuilder> {
+        let url = self.url().join(&self.path).unwrap();
         return self
             .headers()
             .into_iter()
-            .map(|e| (e.0, e.1.replace("{URL}", &self.url.clone().to_string())))
-            .map(|e| (e.0, e.1.replace("{PATH}", &self.url.clone().path())))
-            .map(|e| self.client.get(self.url.clone()).header(e.0, e.1.clone()))
+            .map(|e| (e.0, e.1.replace("{URL}", &url.to_string())))
+            .map(|e| (e.0, e.1.replace("{PATH}", &self.path)))
+            .map(|e| self.client.get(url.clone()).header(e.0, e.1.clone()))
             .collect();
     }
 
     fn using_different_paths(&self) -> Vec<RequestBuilder> {
-        return self
-            .paths()
+        self.paths()
             .into_iter()
-            .map(|path| self.url.join(path))
+            .map(|path| self.url().join(&path))
             .map(|p| self.client.get(p.unwrap()))
-            .collect();
+            .collect()
+    }
+
+    fn url(&self) -> Url {
+        Url::parse(&self.base).unwrap()
     }
 
     pub async fn scan(&self) {

@@ -23,12 +23,19 @@ async fn main() -> Result<(), ()> {
                 .validator(validate_output),
         )
         .arg(
-            Arg::with_name("url")
-                .short("u")
-                .long("url")
+            Arg::with_name("base-url")
+                .short("b")
+                .long("base-url")
                 .takes_value(true)
                 .required(true)
                 .validator(validate_url_prefix),
+        )
+        .arg(
+            Arg::with_name("path")
+                .short("p")
+                .long("path")
+                .takes_value(true)
+                .required(true),
         )
         .arg(
             Arg::with_name("content-length")
@@ -59,9 +66,9 @@ async fn main() -> Result<(), ()> {
 
     debug!("{:#?}", matches);
 
-    let u = matches.value_of("url").unwrap();
-    let url = Url::parse(u).unwrap();
-    debug!("url: {:#?}", url);
+    // TODO: fix separating base and path
+    let base = matches.value_of("base-url").unwrap();
+    let path = matches.value_of("path").unwrap();
 
     let content_length = matches
         .value_of("content-length")
@@ -75,11 +82,17 @@ async fn main() -> Result<(), ()> {
 
     match matches.subcommand() {
         ("bypass", Some(_)) => {
-            let b = bypass::Bypass::new(url, content_length, output.to_string());
+            let b = bypass::Bypass::new(
+                base.to_string(),
+                path.to_string(),
+                content_length,
+                output.to_string(),
+            );
             b.scan().await;
         }
         ("brute-force", Some(args_matches)) => {
             let cidr_string = args_matches.value_of("cidr").unwrap();
+            let url = Url::parse(base).unwrap().join(path).unwrap();
 
             let bf =
                 brute_force::BruteForce::new(url, content_length, output.to_string(), cidr_string);
