@@ -66,7 +66,6 @@ async fn main() -> Result<(), ()> {
 
     debug!("{:#?}", matches);
 
-    // TODO: fix separating base and path
     let base = matches.value_of("base-url").unwrap();
     let path = matches.value_of("path").unwrap();
 
