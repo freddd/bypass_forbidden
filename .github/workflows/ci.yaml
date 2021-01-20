@@ -62,19 +62,14 @@ jobs:
             rust: stable
             target: x86_64-unknown-linux-musl
             bin: bypass_forbidden
-            # We don't enable the progress feature when targeting
-            # musl since there are some dependencies on shared libs
-            features: ""
           - os: windows-latest
             rust: stable
             target: x86_64-pc-windows-msvc
             bin: bypass_forbidden.exe
-            features: progress
           - os: macOS-latest
             rust: stable
             target: x86_64-apple-darwin
             bin: bypass_forbidden
-            features: progress
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install stable toolchain
@@ -92,11 +87,7 @@ jobs:
       - name: Release build
         shell: bash
         run: |
-          if [ "${{ matrix.features }}" != "" ]; then
-            cargo build --release --target ${{ matrix.target }} --features ${{ matrix.features }}
-          else
-            cargo build --release --target ${{ matrix.target }}
-          fi
+          cargo build --release --target ${{ matrix.target }}
       - name: Package
         shell: bash
         run: |
@@ -109,7 +100,7 @@ jobs:
               strip "target/${{ matrix.target }}/release/${{ matrix.bin }}"
           fi
           cp "target/${{ matrix.target }}/release/${{ matrix.bin }}" "$release_name/"
-          cp README.md LICENSE-APACHE LICENSE-MIT "$release_name/"
+          cp README.md "$release_name/"
           tar czvf "$release_tar" "$release_name"
           rm -r "$release_name"
           # Windows environments in github actions don't have the gnu coreutils installed,
@@ -123,6 +114,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          files: "$bypass_forbidden*"
+          files: "bypass_forbidden*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
