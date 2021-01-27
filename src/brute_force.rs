@@ -8,19 +8,17 @@ pub struct BruteForce {
     url: Url,
     client: reqwest::Client,
     content_length: u64,
-    output: String,
     addresses: Vec<Ipv4Addr>,
 }
 
 impl BruteForce {
-    pub fn new(url: Url, content_length: u64, output: String, cidr: &str) -> BruteForce {
+    pub fn new(url: Url, content_length: u64, cidr: &str) -> BruteForce {
         let addresses = cidr.parse::<Ipv4Cidr>().unwrap().iter().collect::<Vec<_>>();
 
         BruteForce {
             url,
             client: Client::new(),
             content_length,
-            output,
             addresses,
         }
     }

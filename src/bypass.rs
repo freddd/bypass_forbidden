@@ -10,17 +10,15 @@ pub struct Bypass {
     path: String,
     client: reqwest::Client,
     content_length: u64,
-    output: String,
 }
 
 impl Bypass {
-    pub fn new(base: String, path: String, content_length: u64, output: String) -> Bypass {
+    pub fn new(base: String, path: String, content_length: u64) -> Bypass {
         Bypass {
             base,
             path,
             client: Client::new(),
             content_length,
-            output,
         }
     }
 

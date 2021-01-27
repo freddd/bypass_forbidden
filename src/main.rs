@@ -76,25 +76,19 @@ async fn main() -> Result<(), ()> {
         .unwrap();
     debug!("content-length: {:#?}", content_length);
 
-    let output = matches.value_of("output").unwrap_or("table");
-    debug!("output: {:#?}", output);
+    //let output = matches.value_of("output").unwrap_or("table");
+    //debug!("output: {:#?}", output);
 
     match matches.subcommand() {
         ("bypass", Some(_)) => {
-            let b = bypass::Bypass::new(
-                base.to_string(),
-                path.to_string(),
-                content_length,
-                output.to_string(),
-            );
+            let b = bypass::Bypass::new(base.to_string(), path.to_string(), content_length);
             b.scan().await;
         }
         ("brute-force", Some(args_matches)) => {
             let cidr_string = args_matches.value_of("cidr").unwrap();
             let url = Url::parse(base).unwrap().join(path).unwrap();
 
-            let bf =
-                brute_force::BruteForce::new(url, content_length, output.to_string(), cidr_string);
+            let bf = brute_force::BruteForce::new(url, content_length, cidr_string);
             bf.scan().await;
         }
         _ => unreachable!(),
