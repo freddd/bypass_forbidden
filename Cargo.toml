@@ -16,7 +16,7 @@ cidr = "0.1.1"
 regex = "1"
 futures = "0.3.8"
 prettytable-rs = "0.8.0"
-
+openssl = { version = "0.10", features = ["vendored"] }
 
 [[bin]]
 name = "bypass_forbidden"
