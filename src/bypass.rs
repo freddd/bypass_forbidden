@@ -53,6 +53,7 @@ impl Bypass {
             ("X-Client-IP", "127.0.0.1"),
             ("X-Host", "127.0.0.1"),
             ("X-Forwarded-Host", "127.0.0.1"),
+            ("True-Client-IP", "127.0.0.1"),
         ]
         .iter()
         .cloned()
